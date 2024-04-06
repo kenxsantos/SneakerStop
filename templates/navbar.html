@@ -1,11 +1,11 @@
 {% load cart_template_tags %}
 
-<nav class="navbar fixed-top navbar-expand-lg navbar-light white scrolling-navbar">
-    <div class="container">
-
+<nav class="navbar fixed-top navbar-expand-lg navbar-light white scrolling-navbar px-2 shadow-none mb-3">
+  <div class="container">
+    <div class="container d-flex justify-content-center">
       <!-- Brand -->
       <a class="navbar-brand waves-effect" href="/">
-        <strong class="blue-text">DJe-commerce</strong>
+        <strong class="black-text poppins-bold">SneakerSpot</strong>
       </a>
 
       <!-- Collapse -->
@@ -16,18 +16,21 @@
 
       <!-- Links -->
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-
-        <!-- Left -->
-        <ul class="navbar-nav mr-auto">
-          {% comment %} <li class="nav-item active">
-            <a class="nav-link waves-effect" href="/">Home
+        <ul class="navbar-nav mx-auto justify-content-center">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">All
               <span class="sr-only">(current)</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link waves-effect" href="/checkout">
-            Checkout</a>
-          </li> {% endcomment %}
+            <a class="nav-link" href="#">Shirts</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Sport wears</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Outwears</a>
+          </li>
         </ul>
 
         <!-- Right -->
@@ -35,9 +38,8 @@
           {% if request.user.is_authenticated %}
           <li class="nav-item">
             <a href="{% url 'core:order-summary' %}" class="nav-link waves-effect">
-              <span class="badge red z-depth-1 mr-1"> {{ request.user|cart_item_count }} </span>
+              <span class="badge red z-depth-1 "> {{ request.user|cart_item_count }} </span>
               <i class="fas fa-shopping-cart"></i>
-              <span class="clearfix d-none d-sm-inline-block"> Cart </span>
             </a>
           </li>
           <li class="nav-item">
@@ -48,17 +50,20 @@
           {% else %}
           <li class="nav-item">
             <a class="nav-link waves-effect" href="{% url 'account_login' %}">
-              <span class="clearfix d-none d-sm-inline-block"> Login </span>
+              <button class="btn btn-primary">Login</button>
+              <!-- <i class="fa-solid fa-user"></i> -->
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link waves-effect" href="{% url 'account_signup' %}">
-              <span class="clearfix d-none d-sm-inline-block"> Signup </span>
-            </a>
-          </li>
+          <!-- <li class="nav-item">
+              <a class="nav-link waves-effect" href="{% url 'account_signup' %}">
+                <span class="clearfix d-none d-sm-inline-block poppins-semibold"> Signup </span>
+              </a>
+            </li> -->
           {% endif %}
         </ul>
       </div>
-
     </div>
-  </nav>
+  </div>
+  </div>
+  </div>
+</nav>

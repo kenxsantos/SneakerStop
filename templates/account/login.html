@@ -7,11 +7,11 @@
 {%endblock %}
 {% block content %}
 <main>
-  <div class="container">
+  <div class="container ">
     <section class="mb-4">
       <div class="row wow fadeIn">
         <div class="col-6 offset-3">
-          <h1>{% trans "Sign In" %}</h1>
+          <h1 class="pacifico-regular text-center black-text">{% trans "Sign In" %}</h1>
 
           {% get_providers as socialaccount_providers %}
           {% if socialaccount_providers %}
@@ -32,13 +32,13 @@
           </div>
 
           {% include "socialaccount/snippets/login_extra.html" %} {% else %}
-          <p>
+          <p class="poppins-regular black-text  text-center">
             {% blocktrans %} If you have not created an account yet, then please
             <a href="{{ signup_url }}">sign up</a> first. {% endblocktrans %}
           </p>
           {% endif %}
 
-          <form class="login" method="POST" action="{% url 'account_login' %}">
+          <form class="login poppins-medium-italic black-text" method="POST" action="{% url 'account_login' %}">
             {% csrf_token %}
             {{ form|crispy }}
             {% if redirect_field_value %}

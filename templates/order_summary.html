@@ -29,10 +29,10 @@
             </td>
             <td class="d-flex justify-content-between align-items-center">
             {% if order_item.item.discount_price %}
-                ${{ order_item.get_total_discount_item_price }}
+            ₱{{ order_item.get_total_discount_item_price }}
                 <span class="badge badge-primary">Saving ₱{{ order_item.get_amount_saved }}</span>
             {% else %}
-                ${{ order_item.get_total_item_price }}
+            ₱{{ order_item.get_total_item_price }}
             {% endif %}
             <a style='color: red;' href="{% url 'core:remove-from-cart' order_item.item.slug %}">
                 <i class="fas fa-trash float-right"></i>
@@ -50,10 +50,47 @@
         </tr>
         {% endfor %}
         {% if object.coupon %}
+        <td colspan="5">
+            {% if DISPLAY_COUPON_FORM %}
+            <form action="{% url 'core:add-coupon-order-summary' %}" method="POST">
+                {% csrf_token %}
+                <div class="input-group">
+                    {{ couponform.code }}
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary btn-sm waves-effect m-0" type="submit">Redeem</button>
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+        </td>
         <tr>
-            <td colspan="4"><b>Coupon</b></td>
-            <td><b>-${{ object.coupon.amount }}</b></td>
+            <td colspan="4"><b>Original Total</b></td>
+            <td class="d-flex justify-content-between align-items-center">
+                <span class="poppins-bold">₱{{ object.get_original_amount }}</span>
+                <span class="badge badge-danger"><p>Total Saving </p> ₱{{ object.get_total_discount_amount }}</span>
+                <a style='color: red;' >
+                    <i class="fas fa-trash float-right"></i>
+                </a>
+            </td>
         </tr>
+        <tr>
+            <td colspan="4"><b>Mechandise Subtotal</b></td>
+            <td><p class="poppins-bold">₱{{ object.get_sub_total }}</p></td>
+        </tr>
+        <tr>
+            <td colspan="4"><b>Shipping Fee</b></td>
+            <td><p class="poppins-bold">₱{{ object.get_shipping_fee }}</p></td>
+        </tr>
+        <tr>
+            <td colspan="3"><b>Coupon</b></td>
+            <td>
+                <p class="badge p-2 text-white bg-dark poppins-bold">{{ object.coupon.code }}</p>
+            </td>
+            <td>
+                <p class="red-text poppins-bold">-₱{{ object.coupon.amount }}</p>
+            </td>
+        </tr>
+        
         {% endif %}
         {% if object.get_total %}
         <tr>

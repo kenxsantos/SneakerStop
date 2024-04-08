@@ -130,6 +130,28 @@ class Order(models.Model):
         if self.coupon:
             total -= self.coupon.amount
         return total
+    
+    def get_sub_total(self):
+        total = 0
+        for order_item in self.items.all():
+            total += order_item.get_final_price()
+        return total
+    
+    def get_original_amount(self):
+        total = 0
+        for order_item in self.items.all():
+            total += order_item.get_total_item_price()
+        return total
+    
+    def get_total_discount_amount(self):
+        total = 0
+        for order_item in self.items.all():
+            total += order_item.get_amount_saved()
+        return total
+    
+    def get_shipping_fee(self):
+        total = 250.00
+        return total
 
 
 class Address(models.Model):

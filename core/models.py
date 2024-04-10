@@ -32,8 +32,20 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
-
-
+    
+class Home(models.Model):
+    title = models.CharField(max_length=100)
+    price = models.FloatField()
+    discount_price = models.FloatField(blank=True, null=True)
+    category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
+    label = models.CharField(choices=LABEL_CHOICES, max_length=1)
+    slug = models.SlugField()
+    description = models.TextField()
+    image = models.ImageField()
+    
+    def __str__(self):
+        return self.title
+    
 class Item(models.Model):
     title = models.CharField(max_length=100)
     price = models.FloatField()
@@ -62,6 +74,48 @@ class Item(models.Model):
             'slug': self.slug
         })
 
+    def get_add_to_favorites_url(self):
+        return reverse("core:add-to-favorites", kwargs={
+            'slug': self.slug
+        })
+    def get_remove_from_favorites_url(self):
+        return reverse("core:remove-from-favorites", kwargs={
+            'slug': self.slug
+        })
+
+class FavoriteItem(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+    ordered = models.BooleanField(default=False)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    quantity = 1
+    def __str__(self):
+        return f"{self.quantity} of {self.item.title}"
+    
+    def get_total_item_price(self):
+        return self.quantity * self.item.price
+
+    def get_total_discount_item_price(self):
+        return self.quantity * self.item.discount_price
+
+    def get_amount_saved(self):
+        return self.get_total_item_price() - self.get_total_discount_item_price()
+
+    def get_final_price(self):
+        if self.item.discount_price:
+            return self.get_total_discount_item_price()
+        return self.get_total_item_price()
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+    items = models.ManyToManyField(FavoriteItem)
+    ordered = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.username
+
 
 class OrderItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -86,7 +140,6 @@ class OrderItem(models.Model):
         if self.item.discount_price:
             return self.get_total_discount_item_price()
         return self.get_total_item_price()
-
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -144,10 +197,7 @@ class Order(models.Model):
         return total
     
     def get_total_discount_amount(self):
-        total = 0
-        for order_item in self.items.all():
-            total += order_item.get_amount_saved()
-        return total
+        return self.get_original_amount() - self.get_sub_total()
     
     def get_shipping_fee(self):
         total = 250.00

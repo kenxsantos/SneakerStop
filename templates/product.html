@@ -31,11 +31,11 @@
           <p class="lead">
             {% if object.discount_price %}
           <h5 class="mr-1 poppins-medium-italic">
-            <del>${{ object.price }}</del>
+            <del>₱{{ object.price }}</del>
           </h5>
-          <h3 class="poppins-semibold black-text">${{ object.discount_price }}</h3>
+          <h3 class="poppins-semibold black-text">₱{{ object.discount_price }}</h3>
           {% else %}
-          <span>${{ object.price }}</span>
+          <span>₱{{ object.price }}</span>
           {% endif %}
           </p>
 
@@ -52,13 +52,16 @@
             </button>
 
           </form> {% endcomment %}
-          <a href="{{ object.get_add_to_cart_url }}" class="btn btn-primary btn-md my-0 p">
-            Add to cart
-            <i class="fas fa-shopping-cart ml-1"></i>
-          </a>
-          <a href="{{ object.get_remove_from_cart_url }}" class="btn btn-danger btn-md my-0 p">
-            Remove from cart
-          </a>
+          <div class="d-flex ">
+            <a href="{{ object.get_add_to_cart_url }}" class="btn btn-dark btn-md my-0 p">
+              Add to cart
+              <i class="fas fa-shopping-cart ml-1"></i>
+            </a>
+            <a href="{{ object.get_add_to_favorites_url}}" class="btn btn-outline-dark btn-md my-0 p">
+              Add to Favorite
+              <i class=" fa-regular fa-heart ml-1 fa-lg"></i>
+            </a>
+          </div>
 
         </div>
         <!--Content-->

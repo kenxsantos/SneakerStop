@@ -49,7 +49,6 @@
             </td>
         </tr>
         {% endfor %}
-        {% if object.coupon %}
         <td colspan="5">
             {% if DISPLAY_COUPON_FORM %}
             <form action="{% url 'core:add-coupon-order-summary' %}" method="POST">
@@ -81,20 +80,28 @@
             <td colspan="4"><i class="fa-solid fa-truck-fast"></i> Shipping Fee </td>
             <td><p class="poppins-bold">₱ {{ object.get_shipping_fee }}</p></td>
         </tr>
-        <tr>
-            <td colspan="3"><i class="fa-solid fa-ticket"></i> Coupon</td>
-            <td>
-                <p class="badge p-2 text-white bg-dark poppins-bold">{{ object.coupon.code }}</p>
-            </td>
-            <td class="d-flex justify-content-between align-items-center">
-                <p class="red-text poppins-bold">-₱ {{ object.coupon.amount }}</p>
-                <a style='color: red;'>
-                    <i class="fas fa-trash float-right"></i>
-                </a>
-            </td>
-            
-        </tr>
-        
+        {% if object.coupon %}
+            {% if object.coupon.code != 'REMOVE' %}
+                <tr>
+                    <td colspan="3"><i class="fa-solid fa-ticket"></i> Coupon</td>
+                    <td>
+                        <p class="badge p-2 text-white bg-dark poppins-bold">{{ object.coupon.code }}</p>
+                    </td>
+                    <td class="d-flex justify-content-between align-items-center">
+                        <p class="red-text poppins-bold">-₱ {{ object.coupon.amount }}</p>
+                        <form action="{% url 'core:clear_coupon' %}" method="POST">
+                            {% csrf_token %}
+                            <!-- Add a hidden input field to submit the coupon code -->
+                            <input type="hidden" name="coupon_code" value="REMOVE">
+                            <!-- HTML with button and icon -->
+                            <button type="submit" class="bg-transparent border-0" style="outline: none; box-shadow: none;">
+                                <a style="color: red;">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </button> 
+                        </form>
+                </tr>
+            {% endif %}
         {% endif %}
         {% if object.get_total %}
         <tr>

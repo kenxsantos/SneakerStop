@@ -15,52 +15,14 @@
         </div>
       </div>
     </div>
-    <h1 class="poppins-semibold">New Arrivals</h1>
     <section class="text-center mb-4">
-      <div class="row wow fadeIn">
-        {% for item in object_list %}
-        <div class="col-lg-3 col-md-6 mb-4">
-          <div class="card">
-            <div class="card position-relative shadow-none">
-              <div class="view overlay">
-                <img src="{{ item.image.url }}" class="card-img-top">
-                <a href="{{ item.get_absolute_url }}">
-                  <div class="mask rgba-white-slight"></div>
-                </a>
-              </div>
-              <span class="badge badge-pill text-white bg-dark {{ item.get_label_display }}-color position-absolute m-2"
-                style="top: 0; right: 0;">NEW</span>
-            </div>
-            <div class="card-body text-center border">
-              <h5>
-                <strong>
-                  <a href="{{ item.get_absolute_url }}" class="black-text poppins-semibold">{{ item.title }}</a>
-                </strong>
-              </h5>
-              <a href="">
-                <span class="badge badge-pill text-white bg-dark ">{{ item.get_category_display }}</span>
-              </a>
-              <h5 class="poppins-regular black-text">
-                <h6>₱
-                  {% if item.discount_price %}
-                  {{ item.discount_price }}
-                  {% else %}
-                  {{ item.price }}
-                  {% endif %}
-                </h6>
-              </h5>
-              <div class="d-flex justify-content-between">
-                <a href="{{ item.get_add_to_cart_url }}" class="text-decoration-none black-text"><i class="fa-solid fa-cart-shopping"></i></a>
-                <a href="{{ item.get_add_to_favorites_url }}" class="text-decoration-none black-text"><i class="fa-regular fa-heart"></i></a>
-              </div>           
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-
+      {% include "new_arrivals.html" %}
     </section>
-    <!--Section: Products v.3-->
+
+    <section class="text-center mb-4">
+      {% include "featured_products.html" %}
+    </section>
+    
 
     <!--Pagination-->
 

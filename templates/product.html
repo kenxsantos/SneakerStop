@@ -24,7 +24,7 @@
 
           <div class="mb-3">
             <a href="">
-              <span class="badge badge-pill text-white bg-dark ">{{ object.get_category_display }}</span>
+              <span class="badge text-white bg-dark ">{{ object.get_category_display }}</span>
             </a>
           </div>  
           <h1 class="poppins-bold black-text">{{ object.title }}</h1>
@@ -33,7 +33,7 @@
           <h5 class="mr-1 poppins-medium-italic">
             <del>₱{{ object.price }}</del>
           </h5>
-          <h3 class="poppins-semibold black-text">₱{{ object.discount_price }}</h3>
+          <h3 class="poppins-semibold red-text">₱{{ object.discount_price }}</h3>
           {% else %}
           <span>₱{{ object.price }}</span>
           {% endif %}

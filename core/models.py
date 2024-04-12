@@ -13,9 +13,9 @@ CATEGORY_CHOICES = (
 )
 
 LABEL_CHOICES = (
-    ('P', 'primary'),
-    ('S', 'secondary'),
-    ('D', 'danger')
+    ('N', 'new'),
+    ('S', 'sale'),
+    ('B', 'bestseller')
 )
 
 ADDRESS_CHOICES = (
@@ -64,11 +64,6 @@ class Item(models.Model):
             'slug': self.slug
         })
     
-    def get_men_category(self):
-        return reverse("core:men-products", kwargs={
-            'category': self.category
-        })
-
     def get_add_to_cart_url(self):
         return reverse("core:add-to-cart", kwargs={
             'slug': self.slug

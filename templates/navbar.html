@@ -16,19 +16,17 @@
     <!-- Links -->
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mx-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="#">All
-            <span class="sr-only">(current)</span>
-          </a>
+        <li class="nav-item">
+          <a  href="{% url 'core:home' %}" class="nav-link">All</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Men</a>
+          <a class="nav-link" href="{% url 'core:category-products' category='men'%}">Men</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Women</a>
+          <a class="nav-link" href="{% url 'core:category-products' category='women'%}">Women</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Kids</a>
+          <a class="nav-link" href="{% url 'core:category-products' category='kids'%}">Kids</a>
         </li>
       </ul>
 

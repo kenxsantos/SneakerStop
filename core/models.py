@@ -7,9 +7,9 @@ from django_countries.fields import CountryField
 
 
 CATEGORY_CHOICES = (
-    ('M', "Men's"),
-    ('W', "Women's"),
-    ('K', 'Kids')
+    ('men', "Men's"),
+    ('women', "Women's"),
+    ('kids', 'Kids')
 )
 
 LABEL_CHOICES = (
@@ -37,7 +37,7 @@ class Home(models.Model):
     title = models.CharField(max_length=100)
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
-    category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
+    category = models.CharField(choices=CATEGORY_CHOICES, max_length=10)
     label = models.CharField(choices=LABEL_CHOICES, max_length=1)
     slug = models.SlugField()
     description = models.TextField()
@@ -50,7 +50,7 @@ class Item(models.Model):
     title = models.CharField(max_length=100)
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
-    category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
+    category = models.CharField(choices=CATEGORY_CHOICES, max_length=10)
     label = models.CharField(choices=LABEL_CHOICES, max_length=1)
     slug = models.SlugField()
     description = models.TextField()
@@ -62,6 +62,11 @@ class Item(models.Model):
     def get_absolute_url(self):
         return reverse("core:product", kwargs={
             'slug': self.slug
+        })
+    
+    def get_men_category(self):
+        return reverse("core:men-products", kwargs={
+            'category': self.category
         })
 
     def get_add_to_cart_url(self):

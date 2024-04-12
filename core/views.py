@@ -36,6 +36,15 @@ def is_valid_form(values):
             valid = False
     return valid
 
+class ItemCategoryView(ListView):
+    model = Item
+    template_name = "category_products.html"
+
+    def get_queryset(self):
+        category = self.kwargs['category']
+        return Item.objects.filter(category=category)
+    
+
 
 class CheckoutView(View):
     def get(self, *args, **kwargs):

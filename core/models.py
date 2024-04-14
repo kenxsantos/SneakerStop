@@ -7,15 +7,15 @@ from django_countries.fields import CountryField
 
 
 CATEGORY_CHOICES = (
-    ('M', "Men's"),
-    ('W', "Women's"),
-    ('K', 'Kids')
+    ('men', "Men's"),
+    ('women', "Women's"),
+    ('kids', 'Kids')
 )
 
 LABEL_CHOICES = (
-    ('P', 'primary'),
-    ('S', 'secondary'),
-    ('D', 'danger')
+    ('N', 'new'),
+    ('S', 'sale'),
+    ('B', 'bestseller')
 )
 
 ADDRESS_CHOICES = (
@@ -37,7 +37,7 @@ class Home(models.Model):
     title = models.CharField(max_length=100)
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
-    category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
+    category = models.CharField(choices=CATEGORY_CHOICES, max_length=10)
     label = models.CharField(choices=LABEL_CHOICES, max_length=1)
     slug = models.SlugField()
     description = models.TextField()
@@ -50,7 +50,7 @@ class Item(models.Model):
     title = models.CharField(max_length=100)
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
-    category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
+    category = models.CharField(choices=CATEGORY_CHOICES, max_length=10)
     label = models.CharField(choices=LABEL_CHOICES, max_length=1)
     slug = models.SlugField()
     description = models.TextField()
@@ -63,7 +63,7 @@ class Item(models.Model):
         return reverse("core:product", kwargs={
             'slug': self.slug
         })
-
+    
     def get_add_to_cart_url(self):
         return reverse("core:add-to-cart", kwargs={
             'slug': self.slug

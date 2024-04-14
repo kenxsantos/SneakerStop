@@ -36,6 +36,15 @@ def is_valid_form(values):
             valid = False
     return valid
 
+class ItemCategoryView(ListView):
+    model = Item
+    template_name = "category_products.html"
+
+    def get_queryset(self):
+        category = self.kwargs['category']
+        return Item.objects.filter(category=category)
+    
+
 
 class CheckoutView(View):
     def get(self, *args, **kwargs):
@@ -472,7 +481,6 @@ class OrderSummaryView(LoginRequiredMixin, View):
             messages.warning(self.request, "You do not have an active order")
             return redirect("/")
 
-
 class ItemDetailView(DetailView):
     model = Item
     template_name = "product.html"
@@ -565,15 +573,30 @@ def remove_single_item_from_cart(request, slug):
         messages.info(request, "You do not have an active order")
         return redirect("core:product", slug=slug)
 
-
+  
 def get_coupon(request, code):
-    try:
-        coupon = Coupon.objects.get(code=code)
-        return coupon
-    except ObjectDoesNotExist:
-        return None
+    coupon_qs = Coupon.objects.filter(code=code)
+    return coupon_qs.first()  # Return the first coupon object if it exists, otherwise None
 
-
+class RemoveCouponViewForOrderSummary(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            order = Order.objects.get(user=request.user, ordered=False)
+            # Check if the form data contains a coupon code
+            coupon_code = request.POST.get('coupon_code')
+            if coupon_code == "REMOVE":
+                # If the coupon code is "REMOVE", remove the coupon from the order
+                order.coupon = None
+                order.save()
+                messages.success(request, "Coupon removed successfully")
+            else:
+                # If the coupon code is not "REMOVE", handle it as usual
+                # You can implement your coupon logic here
+                pass
+        except Order.DoesNotExist:
+            messages.error(request, "You do not have an active order")
+        return redirect("core:order-summary")
+    
 class AddCouponViewForCheckout(View):
     def post(self, request, *args, **kwargs):
         form = CouponForm(request.POST or None)

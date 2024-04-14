@@ -10,6 +10,7 @@
         <thead>
         <tr>
             <th scope="col">#</th>
+            <th scope="col" class="text-center">Product Image</th>
             <th scope="col">Item title</th>
             <th scope="col">Price</th>
             <th scope="col">Quantity</th>
@@ -20,28 +21,31 @@
         {% for order_item in object.items.all %}
         <tr>
             <th scope="row">{{ forloop.counter }}</th>
+            <td class="text-center">
+                <img src="{{ order_item.item.image.url }}" class="img-fluid" style="width: 50px;">
+            </td>
             <td>{{ order_item.item.title }}</td>
             <td>₱ {{ order_item.item.price }}</td>
-            <td>
+            <td class="text-center">
                 <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}"><i class="fas fa-minus mr-2"></i></a>
                 {{ order_item.quantity }}
                 <a href="{% url 'core:add-to-cart' order_item.item.slug %}"><i class="fas fa-plus ml-2"></i></a>
             </td>
             <td class="d-flex justify-content-between align-items-center">
-            {% if order_item.item.discount_price %}
-            ₱ {{ order_item.get_total_discount_item_price }}
+                {% if order_item.item.discount_price %}
+                ₱ {{ order_item.get_total_discount_item_price }}
                 <span class="badge badge-primary">Saving ₱{{ order_item.get_amount_saved }}</span>
-            {% else %}
-            ₱ {{ order_item.get_final_price }}
-            {% endif %}
-            <a style='color: red;' href="{% url 'core:remove-from-cart' order_item.item.slug %}">
-                <i class="fas fa-trash float-right"></i>
-            </a>
+                {% else %}
+                ₱ {{ order_item.get_final_price }}
+                {% endif %}
+                <a style='color: red;' href="{% url 'core:remove-from-cart' order_item.item.slug %}">
+                    <i class="fas fa-trash"></i>
+                </a>
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan='5'>Your cart is empty</td>
+            <td colspan='6'>Your cart is empty</td>
         </tr>
         <tr>
             <td colspan="5">
@@ -49,8 +53,7 @@
             </td>
         </tr>
         {% endfor %}
-        {% if object.coupon %}
-        <td colspan="5">
+        <td colspan="6">
             {% if DISPLAY_COUPON_FORM %}
             <form action="{% url 'core:add-coupon-order-summary' %}" method="POST">
                 {% csrf_token %}
@@ -64,7 +67,7 @@
             {% endif %}
         </td>
         <tr>
-            <td colspan="4"><b>Mechandise Subtotal</b></td>
+            <td colspan="5"><b>Mechandise Subtotal</b></td>
             <td class="d-flex justify-content-between align-items-center">
                 <span class="poppins-bold">₱ {{ object.get_original_amount }}</span>
                 <span class="badge badge-primary">
@@ -74,35 +77,43 @@
             </td>
         </tr>
         <tr>
-            <td colspan="4"><b>Discounted Price</b></td>
+            <td colspan="5"><b>Discounted Price</b></td>
             <td><p class="poppins-bold">₱ {{ object.get_sub_total }}</p></td>
         </tr>
         <tr>
-            <td colspan="4"><i class="fa-solid fa-truck-fast"></i> Shipping Fee </td>
+            <td colspan="5"><i class="fa-solid fa-truck-fast"></i> Shipping Fee </td>
             <td><p class="poppins-bold">₱ {{ object.get_shipping_fee }}</p></td>
         </tr>
-        <tr>
-            <td colspan="3"><i class="fa-solid fa-ticket"></i> Coupon</td>
-            <td>
-                <p class="badge p-2 text-white bg-dark poppins-bold">{{ object.coupon.code }}</p>
-            </td>
-            <td class="d-flex justify-content-between align-items-center">
-                <p class="red-text poppins-bold">-₱ {{ object.coupon.amount }}</p>
-                <a style='color: red;'>
-                    <i class="fas fa-trash float-right"></i>
-                </a>
-            </td>
-            
-        </tr>
-        
+        {% if object.coupon %}
+            {% if object.coupon.code != 'REMOVE' %}
+                <tr>
+                    <td colspan="4"><i class="fa-solid fa-ticket"></i> Coupon</td>
+                    <td>
+                        <p class="badge p-2 text-white bg-dark poppins-bold">{{ object.coupon.code }}</p>
+                    </td>
+                    <td class="d-flex justify-content-between align-items-center">
+                        <p class="red-text poppins-bold">-₱ {{ object.coupon.amount }}</p>
+                        <form action="{% url 'core:clear_coupon' %}" method="POST">
+                            {% csrf_token %}
+                            <!-- Add a hidden input field to submit the coupon code -->
+                            <input type="hidden" name="coupon_code" value="REMOVE">
+                            <!-- HTML with button and icon -->
+                            <button type="submit" class="bg-transparent border-0" style="outline: none; box-shadow: none;">
+                                <a style="color: red;">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </button> 
+                        </form>
+                </tr>
+            {% endif %}
         {% endif %}
         {% if object.get_total %}
         <tr>
-            <td colspan="4"><b>Order Total</b></td>
+            <td colspan="5"><b>Order Total</b></td>
             <td><p class="poppins-bold">₱{{ object.get_total }}</p></td>
         </tr>
         <tr>
-            <td colspan="5">
+            <td colspan="6">
             <a class='btn btn-warning float-right ml-2' href='/checkout/'>Proceed to checkout</a>
             <a class='btn btn-primary float-right' href='/'>Continue shopping</a>
             </td>

@@ -39,7 +39,7 @@ DEBUG_TOOLBAR_CONFIG = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'SneakerSpot', 
+        'NAME': 'SneakerStop', 
         'USER': 'root', 
         'PASSWORD': '',  
         'HOST': 'localhost',  

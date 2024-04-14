@@ -16,19 +16,17 @@
     <!-- Links -->
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mx-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="#">All
-            <span class="sr-only">(current)</span>
-          </a>
+        <li class="nav-item">
+          <a  href="{% url 'core:home' %}" class="nav-link">All</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Men</a>
+          <a class="nav-link" href="{% url 'core:category-products' category='men'%}">Men</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Women</a>
+          <a class="nav-link" href="{% url 'core:category-products' category='women'%}">Women</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Kids</a>
+          <a class="nav-link" href="{% url 'core:category-products' category='kids'%}">Kids</a>
         </li>
       </ul>
 
@@ -42,8 +40,13 @@
           </a>
         </li>
         <li class="nav-item">
+          <a href="{% url 'core:favorites' %}" class="nav-link waves-effect">
+            <span class="badge red z-depth-1 "> {{ request.user|favorites_item_count }} </span>
+            <i class="fa-solid fa-heart"></i>
+          </a>
+        </li> 
+        <li class="nav-item">
           <a class="nav-link waves-effect" href="{% url 'account_logout' %}">
-            
             <span class="clearfix d-none d-sm-inline-block"> Logout </span>
           </a>
         </li>

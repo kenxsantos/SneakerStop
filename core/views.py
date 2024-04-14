@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.views.generic import ListView, DetailView, View
 
 from .forms import CheckoutForm, CouponForm, RefundForm, PaymentForm
-from .models import Item, OrderItem, Order, Address, Payment, Coupon, Refund, UserProfile
+from .models import Item, Home, OrderItem, Order, Address, Payment, Coupon, Refund, UserProfile, FavoriteItem, Favorite
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -35,6 +35,15 @@ def is_valid_form(values):
         if field == '':
             valid = False
     return valid
+
+class ItemCategoryView(ListView):
+    model = Item
+    template_name = "category_products.html"
+
+    def get_queryset(self):
+        category = self.kwargs['category']
+        return Item.objects.filter(category=category)
+    
 
 
 class CheckoutView(View):
@@ -350,6 +359,110 @@ class HomeView(ListView):
     paginate_by = 10
     template_name = "home.html"
 
+class FavoritesView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        try:
+            favorite = Favorite.objects.get(user=self.request.user, ordered=False)
+            form = CheckoutForm()
+            context = {
+                'form': form,
+                'couponform': CouponForm(),
+                'favorite': favorite
+            }
+
+            return render(self.request, 'favorites_item.html', context)
+        except ObjectDoesNotExist:
+            messages.warning(self.request, "You do not have an active order")
+            return redirect("/")
+
+@login_required
+def add_to_favorites(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    favorite_item, created = FavoriteItem.objects.get_or_create(
+        item=item,
+        user=request.user,
+        ordered=False
+    )
+    favorite_qs = Favorite.objects.filter(user=request.user, ordered=False)
+    if favorite_qs.exists():
+        favorite = favorite_qs[0]
+        # check if the order item is in the order
+        if favorite.items.filter(item__slug=item.slug).exists():
+            favorite_item.save()
+            messages.info(request, "Already in your favorites.")
+            return redirect("core:favorites")
+        else:
+            favorite.items.add(favorite_item)
+            messages.info(request, "This item was added to your favorites.")
+            return redirect("core:favorites")
+    else:
+        favorite = Favorite.objects.create(
+            user=request.user)
+        favorite.items.add(favorite_item)
+        messages.info(request, "This item was added to your favorites.")
+        return redirect("core:favorites")
+    
+@login_required
+def remove_from_favorites(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    favorite_qs = Favorite.objects.filter(
+        user=request.user,
+        ordered=False
+    )
+    if favorite_qs.exists():
+        favorite = favorite_qs[0]
+        # check if the order item is in the order
+        if favorite.items.filter(item__slug=item.slug).exists():
+            favorite_item = FavoriteItem.objects.filter(
+                item=item,
+                user=request.user,
+                ordered=False
+            )[0]
+            favorite.items.remove(favorite_item)
+            favorite_item.delete()
+            messages.info(request, "This item was removed from your favorite")
+            return redirect("core:favorites")
+        else:
+            messages.info(request, "This item was not in your favorite")
+            return redirect("core:product", slug=slug)
+    else:
+        messages.info(request, "You do not have an active order")
+        return redirect("core:product", slug=slug)
+    
+@login_required
+def add_to_cart_from_favorites(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+
+    # Add or update the item in the cart
+    order_item, created = OrderItem.objects.get_or_create(
+        item=item,
+        user=request.user,
+        ordered=False
+    )
+
+    # Delete the item from favorites
+    favorite_item = FavoriteItem.objects.filter(item=item, user=request.user)
+    favorite_item.delete()
+
+    # Update the quantity if the item is already in the cart
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    if order_qs.exists():
+        order = order_qs[0]
+        if order.items.filter(item__slug=item.slug).exists():
+            order_item.quantity += 1
+            order_item.save()
+            messages.info(request, "This item quantity was updated.")
+        else:
+            order.items.add(order_item)
+            messages.info(request, "This item was added to your cart.")
+    else:
+        ordered_date = timezone.now()
+        order = Order.objects.create(user=request.user, ordered_date=ordered_date)
+        order.items.add(order_item)
+        messages.info(request, "This item was added to your cart.")
+
+    return redirect("core:order-summary")
+
 
 class OrderSummaryView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
@@ -367,7 +480,6 @@ class OrderSummaryView(LoginRequiredMixin, View):
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")
             return redirect("/")
-
 
 class ItemDetailView(DetailView):
     model = Item
@@ -398,12 +510,11 @@ def add_to_cart(request, slug):
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(
-            user=request.user, ordered_date=ordered_date)
+        user=request.user, ordered_date=ordered_date)
         order.items.add(order_item)
         messages.info(request, "This item was added to your cart.")
         return redirect("core:order-summary")
-
-
+    
 @login_required
 def remove_from_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
@@ -462,15 +573,30 @@ def remove_single_item_from_cart(request, slug):
         messages.info(request, "You do not have an active order")
         return redirect("core:product", slug=slug)
 
-
+  
 def get_coupon(request, code):
-    try:
-        coupon = Coupon.objects.get(code=code)
-        return coupon
-    except ObjectDoesNotExist:
-        return None
+    coupon_qs = Coupon.objects.filter(code=code)
+    return coupon_qs.first()  # Return the first coupon object if it exists, otherwise None
 
-
+class RemoveCouponViewForOrderSummary(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            order = Order.objects.get(user=request.user, ordered=False)
+            # Check if the form data contains a coupon code
+            coupon_code = request.POST.get('coupon_code')
+            if coupon_code == "REMOVE":
+                # If the coupon code is "REMOVE", remove the coupon from the order
+                order.coupon = None
+                order.save()
+                messages.success(request, "Coupon removed successfully")
+            else:
+                # If the coupon code is not "REMOVE", handle it as usual
+                # You can implement your coupon logic here
+                pass
+        except Order.DoesNotExist:
+            messages.error(request, "You do not have an active order")
+        return redirect("core:order-summary")
+    
 class AddCouponViewForCheckout(View):
     def post(self, request, *args, **kwargs):
         form = CouponForm(request.POST or None)

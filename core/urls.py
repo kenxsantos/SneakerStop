@@ -16,6 +16,7 @@ from .views import (
     remove_from_favorites,
     add_to_cart_from_favorites,
     RemoveCouponViewForOrderSummary,
+    ItemCategoryView,
 )
 
 app_name = 'core'
@@ -41,4 +42,6 @@ urlpatterns = [
     path('request-refund/', RequestRefundView.as_view(), name='request-refund'),
 
     path('clear-coupon/order-summary', RemoveCouponViewForOrderSummary.as_view(), name='clear_coupon'),
+
+    path('category/<category>', ItemCategoryView.as_view(), name='category-products'),
 ]

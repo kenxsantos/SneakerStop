@@ -10,6 +10,7 @@
         <thead>
         <tr c>
             <th scope="col">#</th>
+            <th scope="col" class="text-center">Product Image</th>
             <th scope="col">Item title</th>
             <th scope="col">Price</th>
             <th scope="col">Discounted Price</th>
@@ -20,6 +21,9 @@
         {% for favorite_item in favorite.items.all %}
         <tr>
             <th scope="row">{{ forloop.counter }}</th>
+            <td class="text-center">
+                <img src="{{ favorite_item.item.image.url }}" class="img-fluid" style="width: 50px;">
+            </td>
             <td>{{ favorite_item.item.title }}</td>
             <td>₱ {{ favorite_item.item.price }}</td>
             <td class="d-flex justify-content-between align-items-center">
